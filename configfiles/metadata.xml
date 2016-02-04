@@ -1,0 +1,66 @@
+<Entities>
+	<ExtensionPackages>
+		<ExtensionPackage name="InfotableExporterExtension"
+						  description=""
+						  vendor="PTC Romania"
+						  packageVersion="1.5.0"
+						  minimumThingWorxVersion="6.6.0">
+			<JarResources>
+
+	
+			</JarResources>
+			</ExtensionPackage>
+	</ExtensionPackages>
+	<ThingPackages>
+		<ThingPackage name="DataExporter" description="" className="com.ptc.thingworx.Exporter" aspect.isSystemObject="false" aspect.isCreatable="true">
+		<HandlerDefinitions/>		
+		</ThingPackage>
+	</ThingPackages>
+	<ThingTemplates>
+		<ThingTemplate name="DataExporter" description="" thingPackage="DataExporter" aspect.isSystemObject="false">
+			<avatar/>
+		</ThingTemplate>
+	</ThingTemplates>
+
+	<Things>
+		<Thing description="" documentationContent=""
+			   effectiveThingPackage="FileRepositoryThing" enabled="true" homeMashup="" identifier=""
+			   lastModifiedDate="2016-01-27T12:17:49.957+02:00" name="DataExporterRepository" published="false" tags=""
+			   thingTemplate="FileRepository" valueStream="">
+			<Owner name="Administrator" type="User"/>
+			<avatar/>
+			<DesignTimePermissions>
+				<Create/>
+				<Read/>
+				<Update/>
+				<Delete/>
+				<Metadata/>
+			</DesignTimePermissions>
+			<RunTimePermissions/>
+			<VisibilityPermissions>
+				<Visibility/>
+			</VisibilityPermissions>
+			<ConfigurationTables/>
+			<ThingShape>
+				<PropertyDefinitions/>
+				<ServiceDefinitions/>
+				<EventDefinitions/>
+				<ServiceMappings/>
+				<ServiceImplementations/>
+				<Subscriptions/>
+			</ThingShape>
+			<PropertyBindings/>
+			<RemotePropertyBindings/>
+			<RemoteServiceBindings/>
+			<RemoteEventBindings/>
+			<AlertConfigurations/>
+			<ImplementedShapes/>
+			<ThingProperties/>
+			<ConfigurationChanges>
+			</ConfigurationChanges>
+		</Thing>
+	</Things>
+	
+		
+		
+</Entities>

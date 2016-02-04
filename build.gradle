@@ -1,0 +1,172 @@
+group 'com.ptc'
+group 'ThingWorx'
+version '1.0-SNAPSHOT'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'wrapper'
+defaultTasks 'clean', 'build-extension'
+
+project.sourceCompatibility = 1.8
+project.targetCompatibility = 1.8
+
+// set the properties accordingly
+project.ext {
+    extensionJar = "InfotableExporterExtension.jar"
+    baseDir = projectDir
+    common = 'common'
+    uiDir = "${baseDir}/ui" // if there are any widgets
+    localJarDir = "${baseDir}/lib/local" // if you have any jars add them here
+    srcDir = "${baseDir}/src/main" // where are the sources located
+    buildDir = "${baseDir}/build" // where is the build saved
+    configDir = "${baseDir}/configfiles" // folder location of the metadata.xml file
+    zipDir = "${baseDir}/zip" // where to store the generated zip
+    thingworxSdkDir = "${baseDir}/lib/common" // where the thingworx sdk is located
+    packageVendor = "ThingWorx Customer Service"
+    packageName = "InfotableExporterExtension"
+    packageTitle = "InfotableExporterExtension"
+    packageVersion = version
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "${artifactory_contextUrl}/${artifactory_resolve_repokey}"
+        credentials {
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+    }
+
+    flatDir {
+        dirs project.ext.thingworxSdkDir
+    }
+    flatDir {
+        dirs project.ext.localJarDir
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir project.ext.srcDir
+        }
+    }
+}
+
+clean.doFirst {
+    delete project.ext.zipDir
+}
+
+configurations {
+    packageDependencies
+    compile {
+        extendsFrom packageDependencies
+    }
+    thingworxsdk
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    // add all the dependencies for the extension using the packageDependencies configuration. Here only one is added
+
+    packageDependencies 'org.apache.poi:poi-ooxml:3.13'
+
+    packageDependencies 'com.lowagie:itext:2.1.7'
+
+
+
+    // the zip version
+    thingworxsdk group: 'com.thingworx', name: 'Thingworx-Extension-SDK', version: '6.5.0-b460', ext: 'zip'
+    compile fileTree(dir: project.ext.thingworxSdkDir, include: ['*.jar'])
+    packageDependencies fileTree(dir: project.ext.localJarDir, include: ['*.jar'])
+}
+
+task extractTwxSdk(type: Copy) {
+    from {
+        configurations.thingworxsdk.collect { zipTree(it) }
+    }
+    into project.ext.thingworxSdkDir
+}
+
+gradle.projectsEvaluated {
+    compileJava.dependsOn(extractTwxSdk)
+}
+
+jar {
+    archiveName = project.ext.extensionJar
+    manifest {
+        attributes(["Built-By"  : project.ext.packageVendor,
+                    "Build-Date": new Date().format("yyyy-MM-dd HH:mm:ss")])
+        attributes(["Package-Title"  : project.ext.packageTitle,
+                    "Package-Version": project.ext.packageVersion,
+                    "Package-Vendor" : project.ext.packageVendor], project.ext.packageName
+        )
+    }
+}
+def addDependenciesInMetadata() {
+    def file = "${buildDir}/zip/metadata.xml"
+    def parser = new groovy.util.XmlParser(false,true);
+    def xml = parser.parse(file)
+    xml.ExtensionPackages.ExtensionPackage.JarResources[0]?.appendNode(
+            "FileResource",
+            [type: "JAR", file: project.ext.extensionJar]
+    )
+    for(File f:configurations.packageDependencies){
+        if(f.getName().startsWith("commons-codec") ||
+                f.getName().startsWith("commons-io") ||
+                f.getName().startsWith("commons-lang") ||
+                f.getName().startsWith("commons-logging") ||
+                f.getName().startsWith("netty") ||
+                f.getName().startsWith("log4j") ||
+                f.getName().startsWith("httpclient") ||
+                f.getName().startsWith("httpcore") ||
+                f.getName().startsWith("slf4j")
+        ) {
+            continue;
+        }
+        xml.ExtensionPackages.ExtensionPackage.JarResources[0]?.appendNode(
+                "FileResource",
+                [type:"JAR",file:f.getName()]
+        )
+    }
+    PrintWriter pw = new PrintWriter(new File(file))
+    pw.write(groovy.xml.XmlUtil.serialize(xml))
+    pw.close()
+}
+
+task prepPackage(dependsOn: jar) {
+    doLast {
+        delete project.ext.zipDir
+        delete "${buildDir}/zip/"
+
+        // add here all the jars from the packageDependencies configuration
+        copy {
+            from configurations.packageDependencies
+            into "${buildDir}/zip/lib/common/"
+        }
+        // add the configuration
+        copy {
+            from "${project.ext.configDir}"
+            into "${buildDir}/zip/"
+        }
+        addDependenciesInMetadata()
+        // add the extension jar itself
+        copy {
+            from "${buildDir}/libs/${project.ext.extensionJar}"
+            into "${buildDir}/zip/lib/common/"
+        }
+        // add the ui files
+        copy {
+            from uiDir
+            into "${buildDir}/zip/ui/"
+        }
+    }
+}
+
+task packageExtension(type: Zip, dependsOn: prepPackage, overwrite: true) {
+    archiveName = "${project.name}.zip"
+    destinationDir = new File(project.ext.zipDir)
+    from "${buildDir}/zip/"
+}
