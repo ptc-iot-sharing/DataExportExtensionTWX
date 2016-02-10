@@ -41,6 +41,7 @@ public class ExporterUtils {
 
         //search for the repository thing and call one of its method to create the directory inside the Thingworx Storage
         DataExporterRepository = (FileRepositoryThing) ThingUtilities.findThing("DataExporterRepository");
+
         try {
             DataExporterRepository.GetDirectoryStructure();
         } catch (Exception e) {

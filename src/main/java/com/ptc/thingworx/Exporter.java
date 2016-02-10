@@ -15,7 +15,7 @@ import com.thingworx.types.InfoTable;
 
 public class Exporter extends Thing {
 
-    protected static ch.qos.logback.classic.Logger _Logger = LogUtilities.getInstance()
+    protected static final ch.qos.logback.classic.Logger _Logger = LogUtilities.getInstance()
             .getApplicationLogger(Exporter.class);
 
 
