@@ -1,33 +1,18 @@
 package com.ptc.thingworx;
 
 
-import org.slf4j.Logger;
-
 import com.thingworx.logging.LogUtilities;
-import com.thingworx.metadata.annotations.ThingworxConfigurationTableDefinitions;
 import com.thingworx.metadata.annotations.ThingworxServiceDefinition;
-import com.thingworx.metadata.annotations.ThingworxServiceResult;
 import com.thingworx.metadata.annotations.ThingworxServiceParameter;
-import com.thingworx.things.Thing;
+import com.thingworx.resources.Resource;
 import com.thingworx.types.InfoTable;
 
 @SuppressWarnings("serial")
 
-public class Exporter extends Thing {
+public class Exporter extends Resource {
 
     protected static final ch.qos.logback.classic.Logger _Logger = LogUtilities.getInstance()
             .getApplicationLogger(Exporter.class);
-
-
-
-
-    protected void initializeThing() throws Exception {
-
-
-
-    }
-
-
 
     @ThingworxServiceDefinition(name = "ExportInfotableAsPdf", description = "")
     public void ExportInfotableAsPdf(
@@ -37,6 +22,7 @@ public class Exporter extends Thing {
         exp.ExportInfotableAsPdf(infotable);
 
     }
+
     @ThingworxServiceDefinition(name = "ExportInfotableAsExcel", description = "")
     public void ExportInfotableAsExcel(
             @ThingworxServiceParameter(name = "infotable", description = "", baseType = "INFOTABLE") InfoTable infotable)

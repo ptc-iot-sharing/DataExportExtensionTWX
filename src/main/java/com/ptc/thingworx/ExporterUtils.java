@@ -4,12 +4,9 @@ import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-
-
 import com.thingworx.entities.utils.ThingUtilities;
-
-
 import com.thingworx.things.repository.FileRepositoryThing;
+import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,18 +23,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import com.thingworx.types.InfoTable;
 
-
-public class ExporterUtils {
+class ExporterUtils {
 
     //setting the datetime format that suits our need
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-    Calendar cal = Calendar.getInstance();
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+    private Calendar cal = Calendar.getInstance();
 
-    FileRepositoryThing DataExporterRepository;
+    private FileRepositoryThing DataExporterRepository;
 
-    public ExporterUtils() {
+    ExporterUtils() {
 
         //search for the repository thing and call one of its method to create the directory inside the Thingworx Storage
         DataExporterRepository = (FileRepositoryThing) ThingUtilities.findThing("DataExporterRepository");
@@ -51,7 +46,7 @@ public class ExporterUtils {
 
     }
 
-    public void ExportInfotableAsPdf(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
+    void ExportInfotableAsPdf(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
 
         //identify how many columns should the table have
         int columnSize = infotable.getRow(0).size();
@@ -66,7 +61,7 @@ public class ExporterUtils {
         table.setSplitLate(false);
 
         //create the table header with the field definitions from the input infotable
-        for (String name : infotable.getRow(0).keySet()) table.addCell(name);
+        infotable.getRow(0).keySet().forEach(table::addCell);
 
         //populate the rest of the table with values
         for (int i = 0; i < infotable.getRowCount(); i++)
@@ -76,7 +71,7 @@ public class ExporterUtils {
         document.close();
     }
 
-    public void ExportInfotableAsExcel(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
+    void ExportInfotableAsExcel(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
         Workbook workbook = new XSSFWorkbook();
         //create the sheet with data
         Sheet sheet = workbook.createSheet("data");
@@ -111,7 +106,7 @@ public class ExporterUtils {
     }
 
 
-    public void ExportInfotableAsWord(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
+    void ExportInfotableAsWord(InfoTable infotable) throws DocumentException, ClassNotFoundException, IOException {
         XWPFDocument document = new XWPFDocument();
         FileOutputStream out;
         out = new FileOutputStream(

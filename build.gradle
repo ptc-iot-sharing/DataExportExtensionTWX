@@ -1,5 +1,8 @@
+import org.apache.http.entity.mime.MultipartEntityBuilder
+import groovyx.net.http.HTTPBuilder
+import static groovyx.net.http.Method.*
+
 group 'com.ptc'
-group 'ThingWorx'
 version '1.0-SNAPSHOT'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
@@ -7,11 +10,22 @@ apply plugin: 'java'
 apply plugin: 'wrapper'
 defaultTasks 'clean', 'build-extension'
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.apache.httpcomponents:httpmime:4.5.2'
+        classpath 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    }
+}
+
 project.sourceCompatibility = 1.8
 project.targetCompatibility = 1.8
 
 // set the properties accordingly
 project.ext {
+    incrementVersionNumber = true
     extensionJar = "InfotableExporterExtension.jar"
     baseDir = projectDir
     common = 'common'
@@ -73,9 +87,10 @@ dependencies {
 
     packageDependencies 'org.apache.poi:poi-ooxml:3.13'
 
-    packageDependencies 'com.lowagie:itext:2.1.7'
-
-
+    packageDependencies('com.lowagie:itext:2.1.7') {
+        exclude group: 'bouncycastle', module: 'bcprov-jdk14'
+        exclude group: 'bouncycastle', module: 'bcmail-jdk14'
+    }
 
     // the zip version
     thingworxsdk group: 'com.thingworx', name: 'Thingworx-Extension-SDK', version: '6.5.0-b460', ext: 'zip'
@@ -105,16 +120,17 @@ jar {
         )
     }
 }
+
 def addDependenciesInMetadata() {
     def file = "${buildDir}/zip/metadata.xml"
-    def parser = new groovy.util.XmlParser(false,true);
+    def parser = new groovy.util.XmlParser(false, true);
     def xml = parser.parse(file)
     xml.ExtensionPackages.ExtensionPackage.JarResources[0]?.appendNode(
             "FileResource",
             [type: "JAR", file: project.ext.extensionJar]
     )
-    for(File f:configurations.packageDependencies){
-        if(f.getName().startsWith("commons-codec") ||
+    for (File f : configurations.packageDependencies) {
+        if (f.getName().startsWith("commons-codec") ||
                 f.getName().startsWith("commons-io") ||
                 f.getName().startsWith("commons-lang") ||
                 f.getName().startsWith("commons-logging") ||
@@ -128,7 +144,7 @@ def addDependenciesInMetadata() {
         }
         xml.ExtensionPackages.ExtensionPackage.JarResources[0]?.appendNode(
                 "FileResource",
-                [type:"JAR",file:f.getName()]
+                [type: "JAR", file: f.getName()]
         )
     }
     PrintWriter pw = new PrintWriter(new File(file))
@@ -137,6 +153,8 @@ def addDependenciesInMetadata() {
 }
 
 task prepPackage(dependsOn: jar) {
+    if (project.ext.incrementVersionNumber)
+        increaseVersionNumber()
     doLast {
         delete project.ext.zipDir
         delete "${buildDir}/zip/"
@@ -151,7 +169,7 @@ task prepPackage(dependsOn: jar) {
             from "${project.ext.configDir}"
             into "${buildDir}/zip/"
         }
-        addDependenciesInMetadata()
+        //addDependenciesInMetadata()
         // add the extension jar itself
         copy {
             from "${buildDir}/libs/${project.ext.extensionJar}"
@@ -169,4 +187,55 @@ task packageExtension(type: Zip, dependsOn: prepPackage, overwrite: true) {
     archiveName = "${project.name}.zip"
     destinationDir = new File(project.ext.zipDir)
     from "${buildDir}/zip/"
+}
+
+
+def increaseVersionNumber() {
+    def file = "${configDir}/metadata.xml"
+    def parser = new groovy.util.XmlParser(false, true);
+    def xml = parser.parse(file)
+
+    def currentVersion = xml.ExtensionPackages.ExtensionPackage.@packageVersion[0];
+
+    def versionComponents = currentVersion.split('\\.');
+
+    def minorVersion = ++Integer.parseInt(versionComponents[versionComponents.length - 1]);
+
+    versionComponents[versionComponents.length - 1] = String.valueOf(minorVersion);
+
+    xml.ExtensionPackages.ExtensionPackage.@packageVersion = String.join('.', versionComponents);
+    //  xml.ExtensionPackages.ExtensionPackage.get(0).attributes().put('packageVersion', String.join(',', versionComponents));
+
+    println 'Updated to version ' + String.join('.', versionComponents)
+    println xml.ExtensionPackages.ExtensionPackage.@packageVersion[0];
+
+    PrintWriter pw = new PrintWriter(new File(file))
+    pw.write(groovy.xml.XmlUtil.serialize(xml))
+    pw.close()
+}
+
+task upload(dependsOn: packageExtension) {
+    doLast {
+        def http = new HTTPBuilder("${thingworxServerRoot}/Thingworx/")
+        http.auth.basic thingworxUser, thingworxPass
+
+        def extZip = file("${baseDir}/zip/${project.name}.zip")
+
+        http.request(POST) { req ->
+            uri.path = 'ExtensionPackageUploader'
+            uri.query = ['purpose': 'import']
+            headers."X-XSRF-TOKEN" = "TWX-XSRF-TOKEN-VALUE"
+            requestContentType = 'multipart/form-data'
+            MultipartEntityBuilder entity = MultipartEntityBuilder.create().setLaxMode()
+            entity.addBinaryBody('file', extZip)
+            req.setEntity(entity.build())
+            response.success = { resp ->
+                println("Upload successful!")
+            }
+            response.failure = { resp ->
+                println(resp.statusLine)
+                throw new StopExecutionException("Thingworx upload failed! See server response above")
+            }
+        }
+    }
 }
