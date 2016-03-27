@@ -88,7 +88,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     // add all the dependencies for the extension using the packageDependencies configuration. Here only one is added
 
-    packageDependencies 'org.apache.poi:poi-ooxml:3.13'
+    packageDependencies 'org.apache.poi:poi-ooxml:3.14'
+    packageDependencies 'org.apache.poi:poi-ooxml-schemas:3.14'
+    //packageDependencies 'org.apache.poi:ooxml-schemas:1.3'
+
 
     packageDependencies('com.lowagie:itext:2.1.7') {
         exclude group: 'bouncycastle', module: 'bcprov-jdk14'
