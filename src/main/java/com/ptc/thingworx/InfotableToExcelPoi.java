@@ -1,14 +1,17 @@
 package com.ptc.thingworx;
 
 import com.thingworx.common.utils.StringUtilities;
+import com.thingworx.metadata.FieldDefinition;
 import com.thingworx.types.BaseTypes;
 import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
+import com.thingworx.types.primitives.StringPrimitive;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,14 +111,13 @@ public class InfotableToExcelPoi {
         if (isAutoDecideFormatTypes = (formatTypes == null)) {
             formatTypes = new FormatType[numCols];
         }
-        int i = 0;
-        for (String name : infoTable.getFirstRow().keySet()) {
-            writeCell(row, i, name, FormatType.HEADER, boldFont);
+        int i = infoTable.getFieldCount() -1 ;
+        for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
+            writeCell(row, i, new StringPrimitive(fieldDefinition.getName()), FormatType.HEADER, boldFont);
             if (isAutoDecideFormatTypes) {
-                formatTypes[i] = getFormatType(infoTable.getField(name).getBaseType());
+                formatTypes[i] = getFormatType(fieldDefinition.getBaseType());
             }
-            i++;
-
+            i--;
         }
         autoSizeColumns(numCols);
         LOGGER.info("Written table header");
@@ -133,16 +135,17 @@ public class InfotableToExcelPoi {
                 row = sheet.createRow(currentRow++);
             }
             try {
-                int colIndex = 0;
-                for (IPrimitiveType value : infoTable.getRow(rowIndex).values()) {
-                    writeCell(row, colIndex, value.getStringValue(), formatTypes[colIndex], null);
-                    colIndex++;
+                int colIndex = infoTable.getFieldCount() -1;
+                for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
+                    writeCell(row, colIndex, infoTable.getRow(rowIndex).getOrDefault(fieldDefinition.getName(),
+                            fieldDefinition.getDefaultValue()), formatTypes[colIndex], null);
+                    colIndex--;
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to write the item at " + row.getRowNum(), ex);
             }
             // after some data has been written, auto-size again
-            if (rowIndex <= 5) {
+            if (rowIndex <= 50) {
                 // Auto-size columns
                 autoSizeColumns(numCols);
             }
@@ -170,11 +173,11 @@ public class InfotableToExcelPoi {
         }
     }
 
-    private void writeCell(Row row, int col, Object value, FormatType formatType, Font font) {
+    private void writeCell(Row row, int col, IPrimitiveType value, FormatType formatType, Font font) {
         writeCell(row, col, value, formatType, null, font);
     }
 
-    private void writeCell(Row row, int col, Object value, FormatType formatType,
+    private void writeCell(Row row, int col, IPrimitiveType value, FormatType formatType,
                            Short bgColor, Font font) {
         Cell cell = CellUtil.createCell(row, col, null);
         if (value != null) {
@@ -185,37 +188,37 @@ public class InfotableToExcelPoi {
             }
             switch (formatType) {
                 case HEADER:
-                    cell.setCellValue(value.toString());
+                    cell.setCellValue(value.getStringValue());
                     CellUtil.setCellStyleProperty(cell, workbook,
                             CellUtil.FILL_FOREGROUND_COLOR, HSSFColor.ORANGE.index);
                     CellUtil.setCellStyleProperty(cell, workbook,
                             CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
                     break;
                 case TEXT:
-                    writeTextCell(value, cell);
+                    writeTextCell(value.getStringValue(), cell);
                     break;
                 case INTEGER:
-                    cell.setCellValue(((Number) value).intValue());
+                    cell.setCellValue(((Number) value.getValue()).intValue());
                     CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
-                            HSSFDataFormat.getBuiltinFormat(("#,##0")));
+                            HSSFDataFormat.getBuiltinFormat("#,##0"));
                     break;
                 case FLOAT:
-                    cell.setCellValue(((Number) value).doubleValue());
+                    cell.setCellValue(((Number) value.getValue()).doubleValue());
                     CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
-                            HSSFDataFormat.getBuiltinFormat(("#,##0.00")));
+                            HSSFDataFormat.getBuiltinFormat("#,##0.00"));
                     break;
                 case DATE:
-                    cell.setCellValue((Timestamp) value);
+                    cell.setCellValue(((DateTime) value.getValue()).toDate());
                     CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
-                            HSSFDataFormat.getBuiltinFormat(("m/d/yy")));
+                            HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm"));
                     break;
                 case MONEY:
-                    cell.setCellValue(((Number) value).intValue());
+                    cell.setCellValue(((Number) value.getValue()).intValue());
                     CellUtil.setCellStyleProperty(cell, workbook,
                             CellUtil.DATA_FORMAT, format.getFormat("($#,##0.00);($#,##0.00)"));
                     break;
                 case PERCENTAGE:
-                    cell.setCellValue(((Number) value).doubleValue());
+                    cell.setCellValue(((Number) value.getValue()).doubleValue());
                     CellUtil.setCellStyleProperty(cell, workbook,
                             CellUtil.DATA_FORMAT, HSSFDataFormat.getBuiltinFormat("0.00%"));
             }
