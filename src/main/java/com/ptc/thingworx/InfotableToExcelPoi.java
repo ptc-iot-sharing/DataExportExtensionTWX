@@ -9,7 +9,9 @@ import com.thingworx.types.primitives.StringPrimitive;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -48,6 +50,7 @@ public class InfotableToExcelPoi {
         this.infoTable = tableModel;
         sheet = workbook.createSheet();
         createCellStyles(workbook);
+        alternateGreenAndWhiteRows(sheet);
     }
 
     private void createCellStyles(Workbook workbook) {
@@ -110,7 +113,7 @@ public class InfotableToExcelPoi {
         if (isAutoDecideFormatTypes = (formatTypes == null)) {
             formatTypes = new FormatType[numCols];
         }
-        int i = infoTable.getFieldCount() -1 ;
+        int i = infoTable.getFieldCount() - 1;
         for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
             writeCell(row, i, new StringPrimitive(fieldDefinition.getName()), FormatType.HEADER, boldFont);
             if (isAutoDecideFormatTypes) {
@@ -134,7 +137,7 @@ public class InfotableToExcelPoi {
                 row = sheet.createRow(currentRow++);
             }
             try {
-                int colIndex = infoTable.getFieldCount() -1;
+                int colIndex = infoTable.getFieldCount() - 1;
                 for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
                     writeCell(row, colIndex, infoTable.getRow(rowIndex).getOrDefault(fieldDefinition.getName(),
                             fieldDefinition.getDefaultValue()), formatTypes[colIndex], null);
@@ -288,6 +291,21 @@ public class InfotableToExcelPoi {
             CellUtil.setCellStyleProperty(cell, workbook,
                     CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
         }
+    }
+
+    private void alternateGreenAndWhiteRows(Sheet sheet) {
+
+        SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
+        ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule("MOD(ROW(),2)");
+        PatternFormatting fill1 = rule1.createPatternFormatting();
+        fill1.setFillBackgroundColor(new XSSFColor(new java.awt.Color(245, 245, 245)));
+        fill1.setFillPattern(PatternFormatting.SOLID_FOREGROUND);
+        CellRangeAddress[] regions = {
+                new CellRangeAddress(1, infoTable.getRowCount(), 0, infoTable.getFieldCount() - 1)
+        };
+
+        sheetCF.addConditionalFormatting(regions, rule1);
+
     }
 
     private enum FormatType {
