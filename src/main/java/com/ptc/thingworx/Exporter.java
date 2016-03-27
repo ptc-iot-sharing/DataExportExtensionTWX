@@ -4,10 +4,10 @@ package com.ptc.thingworx;
 import com.thingworx.logging.LogUtilities;
 import com.thingworx.metadata.annotations.ThingworxServiceDefinition;
 import com.thingworx.metadata.annotations.ThingworxServiceParameter;
+import com.thingworx.metadata.annotations.ThingworxServiceResult;
 import com.thingworx.resources.Resource;
 import com.thingworx.types.InfoTable;
 
-@SuppressWarnings("serial")
 
 public class Exporter extends Resource {
 
@@ -15,30 +15,45 @@ public class Exporter extends Resource {
             .getApplicationLogger(Exporter.class);
 
     @ThingworxServiceDefinition(name = "ExportInfotableAsPdf", description = "")
-    public void ExportInfotableAsPdf(
+    @ThingworxServiceResult(
+            name = "result",
+            description = "Link to the file",
+            baseType = "STRING"
+    )
+    public String ExportInfotableAsPdf(
             @ThingworxServiceParameter(name = "infotable", description = "", baseType = "INFOTABLE") InfoTable infotable)
             throws Exception {
         ExporterUtils exp = new ExporterUtils();
-        exp.ExportInfotableAsPdf(infotable);
+        return exp.ExportInfotableAsPdf(infotable);
 
     }
 
     @ThingworxServiceDefinition(name = "ExportInfotableAsExcel", description = "")
-    public void ExportInfotableAsExcel(
+    @ThingworxServiceResult(
+            name = "result",
+            description = "Link to the file",
+            baseType = "STRING"
+    )
+    public String ExportInfotableAsExcel(
             @ThingworxServiceParameter(name = "infotable", description = "", baseType = "INFOTABLE") InfoTable infotable)
             throws Exception {
         ExporterUtils exp = new ExporterUtils();
-        exp.ExportInfotableAsExcel(infotable);
+        return exp.ExportInfotableAsExcel(infotable);
 
     }
 
 
     @ThingworxServiceDefinition(name = "ExportInfotableAsWord", description = "")
-    public void ExportInfotableAsWord(
+    @ThingworxServiceResult(
+            name = "result",
+            description = "Link to the file",
+            baseType = "STRING"
+    )
+    public String ExportInfotableAsWord(
             @ThingworxServiceParameter(name = "infotable", description = "", baseType = "INFOTABLE") InfoTable infotable)
             throws Exception {
         ExporterUtils exp = new ExporterUtils();
-        exp.ExportInfotableAsWord(infotable);
+        return exp.ExportInfotableAsWord(infotable);
 
     }
 

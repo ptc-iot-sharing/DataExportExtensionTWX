@@ -40,6 +40,9 @@ project.ext {
     packageName = "InfotableExporterExtension"
     packageTitle = "InfotableExporterExtension"
     packageVersion = version
+    thingworxServerRoot = "http://localhost:8032"
+    thingworxUser = "Administrator"
+    thingworxPass = "admin"
 }
 
 repositories {
@@ -169,7 +172,7 @@ task prepPackage(dependsOn: jar) {
             from "${project.ext.configDir}"
             into "${buildDir}/zip/"
         }
-        //addDependenciesInMetadata()
+        addDependenciesInMetadata()
         // add the extension jar itself
         copy {
             from "${buildDir}/libs/${project.ext.extensionJar}"

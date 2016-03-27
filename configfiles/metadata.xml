@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?><Entities>
   <ExtensionPackages>
-    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.6.3" minimumThingWorxVersion="6.6.0">
+    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.6.29" minimumThingWorxVersion="6.6.0">
       <JarResources/>
     </ExtensionPackage>
   </ExtensionPackages>
   <Resources>
-    <Resource className="com.ptc.thingworx.Exporter" description="Data exporter" name="DataExporters"/>
+    <Resource className="com.ptc.thingworx.Exporter" description="Data exporter" name="DataExporters">
+      <JarResources/>
+      <RunTimePermissions>
+        <Permissions resourceName="*">
+          <ServiceInvoke>
+            <Principal isPermitted="true" principalName="Administrators" type="Group"/>
+            <Principal isPermitted="true" principalName="Developers" type="Group"/>
+            <Principal isPermitted="true" principalName="Users" type="Group"/>
+          </ServiceInvoke>
+        </Permissions>
+      </RunTimePermissions>
+    </Resource>
   </Resources>
   <Things>
     <Thing description="Repository for all the exports" documentationContent="" effectiveThingPackage="FileRepositoryThing" enabled="true" name="DataExporterRepository" published="false" thingTemplate="FileRepository">
