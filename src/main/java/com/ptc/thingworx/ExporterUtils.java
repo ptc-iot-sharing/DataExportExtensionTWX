@@ -1,6 +1,7 @@
 package com.ptc.thingworx;
 
 import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.thingworx.entities.utils.ThingUtilities;
@@ -36,10 +37,10 @@ class ExporterUtils {
         //identify how many columns should the table have
         int columnSize = infotable.getRow(0).size();
 
-        Document document = new Document();
+        Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        String fileName = "Export" + dateFormat.format(cal.getTime()) + ".docx";
+        String fileName = "Export" + dateFormat.format(cal.getTime()) + ".pdf";
 
         PdfWriter.getInstance(document, bos);
         document.open();
@@ -52,11 +53,13 @@ class ExporterUtils {
 
         //populate the rest of the table with values
         for (int i = 0; i < infotable.getRowCount(); i++)
-            for (IPrimitiveType value : infotable.getRow(i).values()) table.addCell(value.getStringValue());
+            for (IPrimitiveType value : infotable.getRow(i).values())
+                table.addCell(value.getStringValue());
         document.add(table);
-        DataExporterRepository.CreateBinaryFile(fileName, bos.toByteArray(), true);
 
         document.close();
+        DataExporterRepository.CreateBinaryFile(fileName, bos.toByteArray(), true);
+
         return DataExporterRepository.GetFileListingWithLinks("/", fileName).getRow(0).getStringValue("downloadLink");
     }
 
