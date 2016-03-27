@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><Entities>
   <ExtensionPackages>
-    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.6.35" minimumThingWorxVersion="6.6.0">
+    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.0.12" minimumThingWorxVersion="6.0.0">
       <JarResources/>
     </ExtensionPackage>
   </ExtensionPackages>
@@ -23,4 +23,14 @@
       <Owner name="Administrator" type="User"/>
     </Thing>
   </Things>
+  <Widgets>
+    <Widget name="infotableExporter">
+      <UIResources>
+        <FileResource type="CSS" file="dataexport.ide.js" description="" isDevelopment="true" isRuntime="false"/>
+        <FileResource type="JS" file="dataexport.ide.js" description="" isDevelopment="true" isRuntime="false"/>
+        <FileResource type="JS" file="dataexport.runtime.js" description="" isDevelopment="false" isRuntime="true"/>
+        <FileResource type="CSS" file="dataexport.runtime.css" description="" isDevelopment="false" isRuntime="true"/>
+      </UIResources>
+    </Widget>
+  </Widgets>
 </Entities>

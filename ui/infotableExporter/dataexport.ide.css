@@ -1,0 +1,61 @@
+.widget-infotableExporter-helper {
+    background:url(images/helper.png) no-repeat top left;
+    width:75px;
+    height:30px;
+}
+.widget-infotableExporter {
+    text-align: center;
+}
+.widget-infotableExporter-wrapper {
+    overflow: hidden;
+}
+.widget-infotableExporter.roundedCorners .widget-infotableExporter-wrapper, .widget-infotableExporter.roundedCorners .widget-infotableExporter-element {
+    border-radius: 6px;
+}
+.widget-infotableExporter-element {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.widget-infotableExporter img {
+    display:inline;
+    padding-right:5px;
+    vertical-align:middle;
+}
+.widget-infotableExporter.iconRight img {
+    padding-left: 5px;
+    padding-right: 0;
+}
+.widget-infotableExporter-text {
+    display:inline;
+    line-height:auto;
+    vertical-align:middle;
+}
+.widget-infotableExporter-disabled, .widget-infotableExporter-disabled:hover, .widget-infotableExporter-disabled:active {
+    background:#d4d4d4 url(images/infotableExporter-disabled.png) repeat-x;
+    opacity:0.5;
+}
+.widget-infotableExporter .widget-infotableExporter-element img.hover {
+    display:none;
+}
+.widget-infotableExporter .widget-infotableExporter-element img.active {
+    display:none;
+}
+.widget-infotableExporter:hover img.default {
+    display:none;
+}
+.widget-infotableExporter:hover img.hover {
+    display:inline;
+}
+.widget-infotableExporter.active .widget-infotableExporter-element img.default {
+    display:none;
+}
+.widget-infotableExporter.active .widget-infotableExporter-element img.hover {
+    display:none;
+}
+.widget-infotableExporter.active .widget-infotableExporter-element img.active {
+    display:inline;
+}
+.widget-infotableExporter.singleImageOnly .widget-infotableExporter-element img.default {
+    display:inline !important;
+}
