@@ -43,14 +43,14 @@
         (thisWidget.getProperty('Label') === undefined ?
           'Export' : Encoder.htmlEncode(thisWidget.getProperty('Label'))) +
         '</span>' + '</button>' +
-        '<div class="dropdown-wrapper"><div class="dropdown-content">' +
+        '<div class="dropdown-content">' +
         '  <ul>\
       <li><a class="exportButton csvExport">CSV</a></li>\
       <li><a class="exportButton excelExport">Excel</a></li>\
       <li><a class="exportButton pdfExport">PDF</a></li>\
       <li><a class="exportButton wordExport">Word</a></li>\
       </ul>' +
-        '</div></div> </div> ';
+        '</div></div> ';
       return html;
     };
 

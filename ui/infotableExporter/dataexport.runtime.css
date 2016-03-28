@@ -86,9 +86,7 @@
   border: none;
   cursor: pointer;
 }
-dropdown-wrapper {
-    position:fixed;
-}
+
 .dropdown-content ul {
   display: table-row;; /* Arrange list items in horizontal line */
   list-style-type: none; /* We don't want bullets on our items */
