@@ -50,7 +50,8 @@ public class InfotableToExcelPoi {
         this.infoTable = tableModel;
         sheet = workbook.createSheet();
         createCellStyles(workbook);
-        alternateGreenAndWhiteRows(sheet);
+        setZebraStyleMode(sheet);
+        setDisplayBorderColumns(sheet);
     }
 
     private void createCellStyles(Workbook workbook) {
@@ -155,19 +156,6 @@ public class InfotableToExcelPoi {
         LOGGER.info("Written all cells");
     }
 
-    /**
-     * Draws border around a given cell
-     * // WARNING: for large files this is extremely slow
-     *
-     * @param cell cell to draw borders around
-     */
-    private void drawBorders(Cell cell) {
-        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.BORDER_BOTTOM, CellStyle.BORDER_THIN);
-        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.BORDER_LEFT, CellStyle.BORDER_THIN);
-        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.BORDER_RIGHT, CellStyle.BORDER_THIN);
-        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.BORDER_TOP, CellStyle.BORDER_THIN);
-    }
-
     private void autoSizeColumns(int numCols) {
         // Auto-size columns
         for (int i = 0; i < numCols; i++) {
@@ -226,9 +214,6 @@ public class InfotableToExcelPoi {
             }
         }
 
-        if (row.getRowNum() < 1_000) {
-            drawBorders(cell);
-        }
         if (bgColor != null) {
             CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_FOREGROUND_COLOR, bgColor);
             CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
@@ -293,7 +278,7 @@ public class InfotableToExcelPoi {
         }
     }
 
-    private void alternateGreenAndWhiteRows(Sheet sheet) {
+    private void setZebraStyleMode(Sheet sheet) {
 
         SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
         ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule("MOD(ROW(),2)");
@@ -306,6 +291,22 @@ public class InfotableToExcelPoi {
 
         sheetCF.addConditionalFormatting(regions, rule1);
 
+    }
+
+    private void setDisplayBorderColumns(Sheet sheet) {
+        SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
+        ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule("TRUE()");
+        BorderFormatting border = rule1.createBorderFormatting();
+        border.setBorderBottom(CellStyle.BORDER_THIN);
+        border.setBorderTop(CellStyle.BORDER_THIN);
+        border.setBorderLeft(CellStyle.BORDER_THIN);
+        border.setBorderRight(CellStyle.BORDER_THIN);
+        border.setBottomBorderColor(PatternFormatting.SOLID_FOREGROUND);
+        CellRangeAddress[] regions = {
+                new CellRangeAddress(0, infoTable.getRowCount(), 0, infoTable.getFieldCount() - 1)
+        };
+
+        sheetCF.addConditionalFormatting(regions, rule1);
     }
 
     private enum FormatType {
