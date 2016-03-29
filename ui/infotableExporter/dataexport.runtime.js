@@ -43,18 +43,51 @@
         (thisWidget.getProperty('Label') === undefined ?
           'Export' : Encoder.htmlEncode(thisWidget.getProperty('Label'))) +
         '</span>' + '</button>' +
-        '<div class="dropdown-content">' +
-        '  <ul>\
-      <li><a class="exportButton csvExport">CSV</a></li>\
-      <li><a class="exportButton excelExport">Excel</a></li>\
-      <li><a class="exportButton pdfExport">PDF</a></li>\
-      <li><a class="exportButton wordExport">Word</a></li>\
-      </ul>' +
-        '</div></div> ';
+        '</div> ';
       return html;
     };
 
     this.afterRender = function() {
+      // get a reference to the div with the dropdown
+
+      thisWidget.jqDropdown = $('<div class="dropdown-content"> \
+        <ul>\
+    <li><a class="exportButton csvExport">CSV</a></li>\
+    <li><a class="exportButton excelExport">Excel</a></li>\
+    <li><a class="exportButton pdfExport">PDF</a></li>\
+    <li><a class="exportButton wordExport">Word</a></li>\
+    </ul>\
+      </div>');
+      // add the dropdown to the body
+      $(document.body).prepend(thisWidget.jqDropdown);
+      thisWidget.jqDropdown.hide();
+      thisWidget.jqElement.hover(function(e) {
+        var offset = thisWidget.jqElement.offset();
+        var height = thisWidget.jqElement.height();
+        var width = thisWidget.jqElement.width();
+        var top = offset.top + height + "px";
+        var left = offset.left + "px";
+        thisWidget.jqDropdown.css({
+          'position': 'absolute',
+          'left': left,
+          'top': top
+        });
+        thisWidget.jqDropdown.show();
+      }, function(e) {
+        setTimeout(function() {
+          if (!thisWidget.jqDropdown.isHoveringNow) {
+            thisWidget.jqDropdown.hide();
+          }
+        }, 500);
+      });
+
+      thisWidget.jqDropdown.hover(function(e) {
+        thisWidget.jqDropdown.isHoveringNow = true;
+      }, function(e) {
+        thisWidget.jqDropdown.isHoveringNow = false;
+        thisWidget.jqDropdown.hide();
+      });
+
       var formatResult = TW.getStyleFromStyleDefinition(thisWidget.getProperty('Style', 'DefaultButtonStyle'));
       var buttonHoverStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('HoverStyle', 'DefaultButtonHoverStyle'));
       var buttonActiveStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('ActiveStyle', 'DefaultButtonActiveStyle'));
@@ -136,7 +169,7 @@
         // "Data_Logs_ConfigurationLog_GetLogEntries"
       }
       var idOfThisMashup = this.idOfThisMashup;
-      var exportButton = thisWidget.jqElement.find(".exportButton");
+      var exportButton = thisWidget.jqDropdown.find(".exportButton");
       var exporterResource = "InfotableExporterFunctions";
       var invoker = new ThingworxInvoker({
         "entityType": "Resources",
@@ -165,9 +198,9 @@
             } else if (this.classList.contains("wordExport")) {
               invoker.setParameterValue("target", "ExportInfotableAsWord")
             }
-             invoker.invokeService(saveDataCallback, function() {
-                        alert("Failed to get export url. Please try again.")
-                      });
+            invoker.invokeService(saveDataCallback, function() {
+              alert("Failed to get export url. Please try again.")
+            });
           }
 
         }
