@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><Entities>
   <ExtensionPackages>
-    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.0.51" minimumThingWorxVersion="6.0.0">
+    <ExtensionPackage name="DataExporterExtension" description="" vendor="PTC Romania" packageVersion="1.0.53" minimumThingWorxVersion="6.0.0">
       <JarResources/>
     </ExtensionPackage>
   </ExtensionPackages>

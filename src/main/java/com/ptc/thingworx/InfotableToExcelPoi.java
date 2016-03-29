@@ -286,7 +286,8 @@ public class InfotableToExcelPoi {
         fill1.setFillBackgroundColor(new XSSFColor(new java.awt.Color(245, 245, 245)));
         fill1.setFillPattern(PatternFormatting.SOLID_FOREGROUND);
         CellRangeAddress[] regions = {
-                new CellRangeAddress(1, infoTable.getRowCount(), 0, infoTable.getFieldCount() - 1)
+                new CellRangeAddress(1, infoTable.getRowCount() == 0 ? 1: infoTable.getRowCount(),
+                        0, infoTable.getFieldCount() - 1)
         };
 
         sheetCF.addConditionalFormatting(regions, rule1);
