@@ -5,9 +5,11 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.thingworx.entities.utils.ThingUtilities;
+import com.thingworx.metadata.FieldDefinition;
 import com.thingworx.things.repository.FileRepositoryThing;
 import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
+import com.thingworx.types.primitives.StringPrimitive;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -35,7 +37,7 @@ class ExporterUtils {
     String ExportInfotableAsPdf(InfoTable infotable) throws Exception {
 
         //identify how many columns should the table have
-        int columnSize = infotable.getRow(0).size();
+        int columnSize = infotable.getFieldCount();
 
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -49,12 +51,23 @@ class ExporterUtils {
         table.setSplitLate(false);
 
         //create the table header with the field definitions from the input infotable
-        infotable.getRow(0).keySet().forEach(table::addCell);
+        infotable.getDataShape().getFields().getOrderedFieldsByOrdinal().forEach(
+                fieldDefinition -> table.addCell(fieldDefinition.getName()));
 
         //populate the rest of the table with values
-        for (int i = 0; i < infotable.getRowCount(); i++)
-            for (IPrimitiveType value : infotable.getRow(i).values())
-                table.addCell(value.getStringValue());
+        for (int rowIndex = 0; rowIndex < infotable.getRowCount(); rowIndex++) {
+            table.completeRow();
+            for (FieldDefinition field : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
+                IPrimitiveType cellValue = infotable.getRow(rowIndex).getOrDefault(field.getName(),
+                        field.getDefaultValue());
+                if(cellValue != null) {
+                    table.addCell(cellValue.getStringValue());
+                } else {
+                    table.addCell("");
+
+                }
+            }
+        }
         document.add(table);
 
         document.close();
@@ -83,24 +96,29 @@ class ExporterUtils {
         //create the table header with the field definitions from the input infotable
         XWPFTableRow tableRowOne = table.getRow(0);
         int j = 0;
-        for (String name : infotable.getRow(0).keySet()) {
+        for (FieldDefinition fieldDefinition : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
             if (j > 0) {
-                tableRowOne.addNewTableCell().setText(name);
+                tableRowOne.addNewTableCell().setText(fieldDefinition.getName());
             } else {
-                tableRowOne.getCell(0).setText(name);
+                tableRowOne.getCell(0).setText(fieldDefinition.getName());
             }
             j++;
         }
 
         //populate the rest of the table with values
-        for (int i = 0; i < infotable.getRowCount(); i++) {
+        for (int rowIndex = 0; rowIndex < infotable.getRowCount(); rowIndex++) {
             XWPFTableRow tableNextRow = table.createRow();
             int x = 0;
-            for (IPrimitiveType value : infotable.getRow(i).values()) {
-                tableNextRow.getCell(x).setText(value.getStringValue());
+            for (FieldDefinition field : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
+                IPrimitiveType cellValue = infotable.getRow(rowIndex).getOrDefault(field.getName(),
+                        field.getDefaultValue());
+                if(cellValue != null) {
+                    tableNextRow.getCell(x).setText(cellValue.getStringValue());
+                } else {
+                    tableNextRow.getCell(x).setText("");
+                }
                 x++;
             }
-
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         document.write(bos);

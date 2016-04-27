@@ -114,13 +114,13 @@ public class InfotableToExcelPoi {
         if (isAutoDecideFormatTypes = (formatTypes == null)) {
             formatTypes = new FormatType[numCols];
         }
-        int i = infoTable.getFieldCount() - 1;
+        int i = 0;
         for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
             writeCell(row, i, new StringPrimitive(fieldDefinition.getName()), FormatType.HEADER, boldFont);
             if (isAutoDecideFormatTypes) {
                 formatTypes[i] = getFormatType(fieldDefinition.getBaseType());
             }
-            i--;
+            i++;
         }
         autoSizeColumns(numCols);
         LOGGER.info("Written table header");
@@ -138,11 +138,11 @@ public class InfotableToExcelPoi {
                 row = sheet.createRow(currentRow++);
             }
             try {
-                int colIndex = infoTable.getFieldCount() - 1;
+                int colIndex = 0;
                 for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
                     writeCell(row, colIndex, infoTable.getRow(rowIndex).getOrDefault(fieldDefinition.getName(),
                             fieldDefinition.getDefaultValue()), formatTypes[colIndex], null);
-                    colIndex--;
+                    colIndex++;
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to write the item at " + row.getRowNum(), ex);
