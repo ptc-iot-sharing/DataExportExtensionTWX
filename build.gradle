@@ -86,8 +86,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     // add all the dependencies for the extension using the packageDependencies configuration. Here only one is added
 
-    packageDependencies 'org.apache.poi:poi-ooxml:3.14'
-    packageDependencies 'org.apache.poi:poi-ooxml-schemas:3.14'
+    packageDependencies 'org.apache.poi:poi-ooxml:4.0.0'
+    packageDependencies 'org.apache.poi:poi-ooxml-schemas:4.0.0'
 
 
     packageDependencies('com.lowagie:itext:2.1.7') {
@@ -137,6 +137,9 @@ def addDependenciesInMetadata() {
                 f.getName().startsWith("commons-io") ||
                 f.getName().startsWith("commons-lang") ||
                 f.getName().startsWith("commons-logging") ||
+                f.getName().startsWith("commons-compress") ||
+                f.getName().startsWith("commons-collections4") ||
+                f.getName().startsWith("bcprov") ||
                 f.getName().startsWith("netty") ||
                 f.getName().startsWith("log4j") ||
                 f.getName().startsWith("httpclient") ||

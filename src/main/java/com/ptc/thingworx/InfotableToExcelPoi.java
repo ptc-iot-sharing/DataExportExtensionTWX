@@ -6,6 +6,7 @@ import com.thingworx.types.BaseTypes;
 import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
 import com.thingworx.types.primitives.StringPrimitive;
+import org.apache.poi.common.usermodel.HyperlinkType;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
@@ -56,7 +57,7 @@ public class InfotableToExcelPoi {
 
     private void createCellStyles(Workbook workbook) {
         boldFont = workbook.createFont();
-        boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        boldFont.setBold(true);
         format = workbook.createDataFormat();
         timeIntervalCellStyle = workbook.createCellStyle();
         timeIntervalCellStyle.setDataFormat(workbook.getCreationHelper().
@@ -179,44 +180,44 @@ public class InfotableToExcelPoi {
             switch (formatType) {
                 case HEADER:
                     cell.setCellValue(value.getStringValue());
-                    CellUtil.setCellStyleProperty(cell, workbook,
-                            CellUtil.FILL_FOREGROUND_COLOR, HSSFColor.ORANGE.index);
-                    CellUtil.setCellStyleProperty(cell, workbook,
-                            CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
+                    CellUtil.setCellStyleProperty(cell,
+                            CellUtil.FILL_FOREGROUND_COLOR, HSSFColor.HSSFColorPredefined.ORANGE.getIndex());
+                    CellUtil.setCellStyleProperty(cell,
+                            CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
                     break;
                 case TEXT:
                     writeTextCell(value.getStringValue(), cell);
                     break;
                 case INTEGER:
                     cell.setCellValue(((Number) value.getValue()).intValue());
-                    CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
+                    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT,
                             HSSFDataFormat.getBuiltinFormat("#,##0"));
                     break;
                 case FLOAT:
                     cell.setCellValue(((Number) value.getValue()).doubleValue());
-                    CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
+                    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT,
                             HSSFDataFormat.getBuiltinFormat("#,##0.00"));
                     break;
                 case DATE:
                     cell.setCellValue(((DateTime) value.getValue()).toDate());
-                    CellUtil.setCellStyleProperty(cell, workbook, CellUtil.DATA_FORMAT,
+                    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT,
                             HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm"));
                     break;
                 case MONEY:
                     cell.setCellValue(((Number) value.getValue()).intValue());
-                    CellUtil.setCellStyleProperty(cell, workbook,
-                            CellUtil.DATA_FORMAT, format.getFormat("($#,##0.00);($#,##0.00)"));
+                    CellUtil.setCellStyleProperty(cell, CellUtil.DATA_FORMAT,
+                            format.getFormat("($#,##0.00);($#,##0.00)"));
                     break;
                 case PERCENTAGE:
                     cell.setCellValue(((Number) value.getValue()).doubleValue());
-                    CellUtil.setCellStyleProperty(cell, workbook,
+                    CellUtil.setCellStyleProperty(cell,
                             CellUtil.DATA_FORMAT, HSSFDataFormat.getBuiltinFormat("0.00%"));
             }
         }
 
         if (bgColor != null) {
-            CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_FOREGROUND_COLOR, bgColor);
-            CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
+            CellUtil.setCellStyleProperty(cell, CellUtil.FILL_FOREGROUND_COLOR, bgColor);
+            CellUtil.setCellStyleProperty(cell, CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
         }
     }
 
@@ -257,7 +258,7 @@ public class InfotableToExcelPoi {
                 // we have a hyperlink
                 cell.setCellStyle(linkCellStyle);
                 cell.setCellValue("Ctrl+Click to open");
-                Hyperlink link = workbook.getCreationHelper().createHyperlink(Hyperlink.LINK_URL);
+                Hyperlink link = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
                 link.setAddress(stringValue);
                 cell.setHyperlink(link);
 
@@ -271,10 +272,9 @@ public class InfotableToExcelPoi {
             }
         }
         if (isAlertString) {
-            CellUtil.setCellStyleProperty(cell, workbook,
-                    CellUtil.FILL_FOREGROUND_COLOR, HSSFColor.ORANGE.index);
-            CellUtil.setCellStyleProperty(cell, workbook,
-                    CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
+            CellUtil.setCellStyleProperty(cell, CellUtil.FILL_FOREGROUND_COLOR,
+                    HSSFColor.HSSFColorPredefined.ORANGE.getIndex());
+            CellUtil.setCellStyleProperty(cell, CellUtil.FILL_PATTERN, FillPatternType.SOLID_FOREGROUND);
         }
     }
 
@@ -283,7 +283,7 @@ public class InfotableToExcelPoi {
         SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
         ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule("MOD(ROW(),2)");
         PatternFormatting fill1 = rule1.createPatternFormatting();
-        fill1.setFillBackgroundColor(new XSSFColor(new java.awt.Color(245, 245, 245)));
+        fill1.setFillBackgroundColor(new XSSFColor(new byte[]{(byte) 245, (byte) 245, (byte) 245}, null));
         fill1.setFillPattern(PatternFormatting.SOLID_FOREGROUND);
         CellRangeAddress[] regions = {
                 new CellRangeAddress(1, infoTable.getRowCount() == 0 ? 1: infoTable.getRowCount(),
@@ -298,10 +298,10 @@ public class InfotableToExcelPoi {
         SheetConditionalFormatting sheetCF = sheet.getSheetConditionalFormatting();
         ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule("TRUE()");
         BorderFormatting border = rule1.createBorderFormatting();
-        border.setBorderBottom(CellStyle.BORDER_THIN);
-        border.setBorderTop(CellStyle.BORDER_THIN);
-        border.setBorderLeft(CellStyle.BORDER_THIN);
-        border.setBorderRight(CellStyle.BORDER_THIN);
+        border.setBorderBottom(BorderStyle.THIN);
+        border.setBorderTop(BorderStyle.THIN);
+        border.setBorderLeft(BorderStyle.THIN);
+        border.setBorderRight(BorderStyle.THIN);
         border.setBottomBorderColor(PatternFormatting.SOLID_FOREGROUND);
         CellRangeAddress[] regions = {
                 new CellRangeAddress(0, infoTable.getRowCount(), 0, infoTable.getFieldCount() - 1)
