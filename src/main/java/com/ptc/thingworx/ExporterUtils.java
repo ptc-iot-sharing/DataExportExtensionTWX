@@ -1,7 +1,9 @@
 package com.ptc.thingworx;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
+import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.thingworx.entities.utils.ThingUtilities;
@@ -9,11 +11,11 @@ import com.thingworx.metadata.FieldDefinition;
 import com.thingworx.things.repository.FileRepositoryThing;
 import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
-import com.thingworx.types.primitives.StringPrimitive;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,24 +37,30 @@ class ExporterUtils {
     }
 
     String ExportInfotableAsPdf(InfoTable infotable) throws Exception {
-
         //identify how many columns should the table have
         int columnSize = infotable.getFieldCount();
 
-        Document document = new Document(PageSize.A4.rotate());
+        final Rectangle pageSize = PageSize.A4.rotate();
+        Document document = new Document(pageSize);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         String fileName = "Export" + dateFormat.format(cal.getTime()) + ".pdf";
 
-        PdfWriter.getInstance(document, bos);
+        final PdfWriter writer = PdfWriter.getInstance(document, bos);
         document.open();
         //create the pdf file with the right numbers of columns
         PdfPTable table = new PdfPTable(columnSize);
         table.setSplitLate(false);
+        Font headerFont = new Font(Font.TIMES_ROMAN, 11, Font.BOLD, new Color(0, 0, 0));
+        Font rowFont = new Font(Font.TIMES_ROMAN, 11);
 
         //create the table header with the field definitions from the input infotable
         infotable.getDataShape().getFields().getOrderedFieldsByOrdinal().forEach(
-                fieldDefinition -> table.addCell(fieldDefinition.getName()));
+                fieldDefinition -> {
+                    PdfPCell cell = new PdfPCell(new Phrase(fieldDefinition.getName(), headerFont));
+                    cell.setBackgroundColor(Color.LIGHT_GRAY);
+                    table.addCell(cell);
+                });
 
         //populate the rest of the table with values
         for (int rowIndex = 0; rowIndex < infotable.getRowCount(); rowIndex++) {
@@ -60,8 +68,8 @@ class ExporterUtils {
             for (FieldDefinition field : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
                 IPrimitiveType cellValue = infotable.getRow(rowIndex).getOrDefault(field.getName(),
                         field.getDefaultValue());
-                if(cellValue != null) {
-                    table.addCell(cellValue.getStringValue());
+                if (cellValue != null) {
+                    table.addCell(new Phrase(cellValue.getStringValue(), rowFont));
                 } else {
                     table.addCell("");
 
@@ -112,7 +120,7 @@ class ExporterUtils {
             for (FieldDefinition field : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
                 IPrimitiveType cellValue = infotable.getRow(rowIndex).getOrDefault(field.getName(),
                         field.getDefaultValue());
-                if(cellValue != null) {
+                if (cellValue != null) {
                     tableNextRow.getCell(x).setText(cellValue.getStringValue());
                 } else {
                     tableNextRow.getCell(x).setText("");

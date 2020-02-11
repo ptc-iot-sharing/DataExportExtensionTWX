@@ -71,7 +71,6 @@ configurations {
     compile {
         extendsFrom packageDependencies
     }
-    thingworxsdk
 }
 
 dependencies {
@@ -82,26 +81,14 @@ dependencies {
     packageDependencies 'org.apache.poi:poi-ooxml-schemas:4.0.0'
 
 
-    packageDependencies('com.lowagie:itext:2.1.7') {
+    packageDependencies('com.github.librepdf:openpdf:1.3.13') {
         exclude group: 'bouncycastle', module: 'bcprov-jdk14'
         exclude group: 'bouncycastle', module: 'bcmail-jdk14'
     }
 
     // the zip version
-    thingworxsdk group: 'com.thingworx', name: 'Thingworx-Extension-SDK', version: '6.5.0-b460', ext: 'zip'
     compile fileTree(dir: project.ext.thingworxSdkDir, include: ['*.jar'])
     packageDependencies fileTree(dir: project.ext.localJarDir, include: ['*.jar'])
-}
-
-task extractTwxSdk(type: Copy) {
-    from {
-        configurations.thingworxsdk.collect { zipTree(it) }
-    }
-    into project.ext.thingworxSdkDir
-}
-
-gradle.projectsEvaluated {
-    compileJava.dependsOn(extractTwxSdk)
 }
 
 jar {
