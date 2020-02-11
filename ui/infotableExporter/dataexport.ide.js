@@ -1,5 +1,5 @@
 ﻿﻿TW.IDE.Widgets.infotableExporter = function () {
-	var roundedCorners = true;
+    var roundedCorners = true;
     this.widgetProperties = function () {
         return {
             'name': 'Infotable Exporter',
@@ -51,21 +51,21 @@
                     'baseType': 'INFOTABLE',
                     'warnIfNotBoundAsTarget': true
                 },
-				'Style': {
+                'Style': {
                     'baseType': 'STYLEDEFINITION',
                     'defaultValue': 'DefaultButtonStyle'
                 },
-				'HoverStyle': {
+                'HoverStyle': {
                     'baseType': 'STYLEDEFINITION',
-					'defaultValue': 'DefaultButtonHoverStyle'
+                    'defaultValue': 'DefaultButtonHoverStyle'
                 },
-				'ActiveStyle': {
+                'ActiveStyle': {
                     'baseType': 'STYLEDEFINITION',
-					'defaultValue': 'DefaultButtonActiveStyle'
+                    'defaultValue': 'DefaultButtonActiveStyle'
                 },
-				'FocusStyle': {
+                'FocusStyle': {
                     'baseType': 'STYLEDEFINITION',
-					'defaultValue': 'DefaultButtonFocusStyle'
+                    'defaultValue': 'DefaultButtonFocusStyle'
                 },
                 'IconAlignment': {
                     'description': 'Either align the icon for the button to the left or the right of the text',
@@ -82,76 +82,76 @@
 
     this.renderHtml = function () {
 
-		var formatResult = TW.getStyleFromStyleDefinition(this.getProperty('Style', 'DefaultButtonStyle'));
-		var formatResult2 = TW.getStyleFromStyleDefinition(this.getProperty('HoverStyle', 'DefaultButtonHoverStyle'));
-		var formatResult3 = TW.getStyleFromStyleDefinition(this.getProperty('ActiveStyle', 'DefaultButtonActiveStyle'));
+        var formatResult = TW.getStyleFromStyleDefinition(this.getProperty('Style', 'DefaultButtonStyle'));
+        var formatResult2 = TW.getStyleFromStyleDefinition(this.getProperty('HoverStyle', 'DefaultButtonHoverStyle'));
+        var formatResult3 = TW.getStyleFromStyleDefinition(this.getProperty('ActiveStyle', 'DefaultButtonActiveStyle'));
 
-	    var textSizeClass = 'textsize-normal';
-	    if (this.getProperty('Style') !== undefined) {
-	        textSizeClass = TW.getTextSizeClassName(formatResult.textSize);
-	    }
+        var textSizeClass = 'textsize-normal';
+        if (this.getProperty('Style') !== undefined) {
+            textSizeClass = TW.getTextSizeClassName(formatResult.textSize);
+        }
 
-		var html = '';
+        var html = '';
 
-		var buttonBorderWidth = TW.getStyleCssBorderWidthOnlyFromStyle(formatResult);
-		var buttonHeight = this.getProperty('Height');
-		var adjustedWrapperHeight = this.getProperty('Height') - buttonBorderWidth * 2;
+        var buttonBorderWidth = TW.getStyleCssBorderWidthOnlyFromStyle(formatResult);
+        var buttonHeight = this.getProperty('Height');
+        var adjustedWrapperHeight = this.getProperty('Height') - buttonBorderWidth * 2;
 
         html +=
             '<div class="widget-content widget-infotableExporter">'
-				+ '<div class="widget-infotableExporter-wrapper">'
-					+ '<div class="widget-infotableExporter-element" style="height:'+ buttonHeight +'px; line-height:'+ adjustedWrapperHeight +'px;">'
-                        + '<span class="widget-infotableExporter-icon">'
-    						+ ((formatResult.image !== undefined && formatResult.image.length > 0) ? '<img class="default" src="' + formatResult.image + '"/>' : '')
-    						+ ((formatResult2.image !== undefined && formatResult2.image.length > 0) ? '<img class="hover" src="' + formatResult2.image + '"/>' : '')
-    						+ ((formatResult3.image !== undefined && formatResult3.image.length > 0) ? '<img class="active" src="' + formatResult3.image + '"/>' : '')
-                        + '</span>'
-						+ '<span class="widget-infotableExporter-text ' + textSizeClass + '">' + (this.getProperty('Label') === undefined ? 'Export' : Encoder.htmlEncode(this.getProperty('Label'))) + '</span>'
-					+ '</div>'
-				+ '</div>'
-          + '</div>';
+            + '<div class="widget-infotableExporter-wrapper">'
+            + '<div class="widget-infotableExporter-element" style="height:' + buttonHeight + 'px; line-height:' + adjustedWrapperHeight + 'px;">'
+            + '<span class="widget-infotableExporter-icon">'
+            + ((formatResult.image !== undefined && formatResult.image.length > 0) ? '<img class="default" src="' + formatResult.image + '"/>' : '')
+            + ((formatResult2.image !== undefined && formatResult2.image.length > 0) ? '<img class="hover" src="' + formatResult2.image + '"/>' : '')
+            + ((formatResult3.image !== undefined && formatResult3.image.length > 0) ? '<img class="active" src="' + formatResult3.image + '"/>' : '')
+            + '</span>'
+            + '<span class="widget-infotableExporter-text ' + textSizeClass + '">' + (this.getProperty('Label') === undefined ? 'Export' : Encoder.htmlEncode(this.getProperty('Label'))) + '</span>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
         return html;
     };
 
-	this.afterRender = function () {
-		var thisWidget = this;
+    this.afterRender = function () {
+        var thisWidget = this;
 
-		var buttonStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('Style'));
-		var buttonHoverStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('HoverStyle'));
-		var buttonActiveStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('ActiveStyle'));
+        var buttonStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('Style'));
+        var buttonHoverStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('HoverStyle'));
+        var buttonActiveStyle = TW.getStyleFromStyleDefinition(thisWidget.getProperty('ActiveStyle'));
 
-		var buttonBackground = TW.getStyleCssGradientFromStyle(buttonStyle);
-		var buttonText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonStyle);
-		var buttonBorder = TW.getStyleCssBorderFromStyle(buttonStyle);
-		var buttonHoverBG = TW.getStyleCssGradientFromStyle(buttonHoverStyle);
-		var buttonHoverText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonHoverStyle);
-		var buttonHoverBorder = TW.getStyleCssBorderFromStyle(buttonHoverStyle);
-		var cssButtonActiveText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonActiveStyle);
-		var cssButtonActiveBackground = TW.getStyleCssGradientFromStyle(buttonActiveStyle);
-		var cssButtonActiveBorder = TW.getStyleCssBorderFromStyle(buttonActiveStyle);
+        var buttonBackground = TW.getStyleCssGradientFromStyle(buttonStyle);
+        var buttonText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonStyle);
+        var buttonBorder = TW.getStyleCssBorderFromStyle(buttonStyle);
+        var buttonHoverBG = TW.getStyleCssGradientFromStyle(buttonHoverStyle);
+        var buttonHoverText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonHoverStyle);
+        var buttonHoverBorder = TW.getStyleCssBorderFromStyle(buttonHoverStyle);
+        var cssButtonActiveText = TW.getStyleCssTextualNoBackgroundFromStyle(buttonActiveStyle);
+        var cssButtonActiveBackground = TW.getStyleCssGradientFromStyle(buttonActiveStyle);
+        var cssButtonActiveBorder = TW.getStyleCssBorderFromStyle(buttonActiveStyle);
 
-		roundedCorners = this.getProperty('RoundedCorners');
-		if (roundedCorners === undefined) {
-			roundedCorners = true;
-		}
+        roundedCorners = this.getProperty('RoundedCorners');
+        if (roundedCorners === undefined) {
+            roundedCorners = true;
+        }
 
-		if (roundedCorners == true) {
-			thisWidget.jqElement.addClass('roundedCorners');
-		}
+        if (roundedCorners == true) {
+            thisWidget.jqElement.addClass('roundedCorners');
+        }
 
-		thisWidget.jqElement.mousedown(function() {
-    		thisWidget.jqElement.addClass('active');
-		}).mouseup(function(){
-			thisWidget.jqElement.removeClass('active');
-		})
+        thisWidget.jqElement.mousedown(function () {
+            thisWidget.jqElement.addClass('active');
+        }).mouseup(function () {
+            thisWidget.jqElement.removeClass('active');
+        })
 
-		var resource = TW.IDE.getMashupResource();
+        var resource = TW.IDE.getMashupResource();
         var widgetStyles =
-            '#' + thisWidget.jqElementId + '.widget-infotableExporter span {'+ buttonText + '} ' +
-            '#' + thisWidget.jqElementId + '.widget-infotableExporter:hover span {'+ buttonHoverText + '} ' +
-            '#' + thisWidget.jqElementId + '.widget-infotableExporter .widget-infotableExporter-element {'+ buttonBackground + buttonBorder + '} ' +
-            '#' + thisWidget.jqElementId + '.widget-infotableExporter:hover .widget-infotableExporter-element {'+ buttonHoverBG + buttonHoverBorder + '} ' +
-            '#' + thisWidget.jqElementId + '.widget-infotableExporter.active .widget-infotableExporter-element {'+ cssButtonActiveBackground + cssButtonActiveBorder +'}';
+            '#' + thisWidget.jqElementId + '.widget-infotableExporter span {' + buttonText + '} ' +
+            '#' + thisWidget.jqElementId + '.widget-infotableExporter:hover span {' + buttonHoverText + '} ' +
+            '#' + thisWidget.jqElementId + '.widget-infotableExporter .widget-infotableExporter-element {' + buttonBackground + buttonBorder + '} ' +
+            '#' + thisWidget.jqElementId + '.widget-infotableExporter:hover .widget-infotableExporter-element {' + buttonHoverBG + buttonHoverBorder + '} ' +
+            '#' + thisWidget.jqElementId + '.widget-infotableExporter.active .widget-infotableExporter-element {' + cssButtonActiveBackground + cssButtonActiveBorder + '}';
         resource.styles.append(widgetStyles);
 
         var iconAlignment = this.getProperty('IconAlignment');
@@ -163,7 +163,7 @@
             thisWidget.jqElement.addClass('iconRight');
         }
 
-	};
+    };
 
     this.afterAddBindingSource = function (bindingInfo) {
         if (bindingInfo['targetProperty'] === 'Data') {
@@ -179,20 +179,20 @@
     this.afterSetProperty = function (name, value) {
         var result = false;
         switch (name) {
-        case 'Label' :
-    	case 'Style':
-    	case 'Width':
-		case 'Height':
-        case 'RoundedCorners':
-        case 'HoverStyle':
-        case 'IconAlignment':
-            result = true;
-            break;
+            case 'Label':
+            case 'Style':
+            case 'Width':
+            case 'Height':
+            case 'RoundedCorners':
+            case 'HoverStyle':
+            case 'IconAlignment':
+                result = true;
+                break;
         }
         return result;
     };
 
-		this.widgetIconUrl = function () {
-				return "../Common/thingworx/widgets/dataexport/dataexport.ide.png";
-		};
+    this.widgetIconUrl = function () {
+        return "../Common/thingworx/widgets/dataexport/dataexport.ide.png";
+    };
 };
