@@ -13,13 +13,19 @@ import com.thingworx.types.InfoTable;
 import com.thingworx.types.primitives.IPrimitiveType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -131,6 +137,21 @@ class ExporterUtils {
 
     String ExportInfotableAsWord(InfoTable infotable) throws Exception {
         XWPFDocument document = new XWPFDocument();
+        CTBody body = document.getDocument().getBody();
+        if(!body.isSetSectPr()){
+            body.addNewSectPr();
+        }
+
+        CTSectPr section = body.getSectPr();
+        if(!section.isSetPgSz()){
+            section.addNewPgSz();
+        }
+
+        CTPageSz pageSize = section.getPgSz();
+        pageSize.setOrient(STPageOrientation.LANDSCAPE);
+        //A4 = 595x842 / multiply 20 since BigInteger represents 1/20 Point
+        pageSize.setW(BigInteger.valueOf(16840));
+        pageSize.setH(BigInteger.valueOf(11900));
         XWPFTable table = document.createTable();
 
         //create the table header with the field definitions from the input infotable
@@ -138,9 +159,13 @@ class ExporterUtils {
         int j = 0;
         for (FieldDefinition fieldDefinition : infotable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
             if (j > 0) {
-                tableRowOne.addNewTableCell().setText(fieldDefinition.getName());
+                final XWPFTableCell cell = tableRowOne.addNewTableCell();
+                cell.setColor("c0c0c0");
+                cell.setText(fieldDefinition.getName());
             } else {
-                tableRowOne.getCell(0).setText(fieldDefinition.getName());
+                final XWPFTableCell cell = tableRowOne.getCell(0);
+                cell.setColor("c0c0c0");
+                cell.setText(fieldDefinition.getName());
             }
             j++;
         }
