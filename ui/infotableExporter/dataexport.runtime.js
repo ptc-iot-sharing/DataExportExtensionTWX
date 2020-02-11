@@ -1,12 +1,12 @@
-(function() {
+(function () {
   var addedDefaultStyles = false;
 
-  TW.Runtime.Widgets.infotableExporter = function() {
+  TW.Runtime.Widgets.infotableExporter = function () {
 
     var thisWidget = this;
     var roundedCorners = true;
 
-    this.runtimeProperties = function() {
+    this.runtimeProperties = function () {
       return {
         'needsDataLoadingAndError': false,
         'propertyAttributes': {
@@ -17,7 +17,7 @@
       };
     };
 
-    this.renderHtml = function() {
+    this.renderHtml = function () {
 
       var formatResult = TW.getStyleFromStyleDefinition(thisWidget.getProperty('Style', 'DefaultButtonStyle'));
       var formatResult2 = TW.getStyleFromStyleDefinition(thisWidget.getProperty('HoverStyle', 'DefaultButtonHoverStyle'));
@@ -47,7 +47,7 @@
       return html;
     };
 
-    this.afterRender = function() {
+    this.afterRender = function () {
       // get a reference to the div with the dropdown
 
       thisWidget.jqDropdown = $('<div class="dropdown-content"> \
@@ -61,7 +61,7 @@
       // add the dropdown to the body
       $(document.body).prepend(thisWidget.jqDropdown);
       thisWidget.jqDropdown.hide();
-      thisWidget.jqElement.hover(function(e) {
+      thisWidget.jqElement.hover(function (e) {
         var offset = thisWidget.jqElement.offset();
         var height = thisWidget.jqElement.height();
         var width = thisWidget.jqElement.width();
@@ -73,17 +73,17 @@
           'top': top
         });
         thisWidget.jqDropdown.show();
-      }, function(e) {
-        setTimeout(function() {
+      }, function (e) {
+        setTimeout(function () {
           if (!thisWidget.jqDropdown.isHoveringNow) {
             thisWidget.jqDropdown.hide();
           }
         }, 500);
       });
 
-      thisWidget.jqDropdown.hover(function(e) {
+      thisWidget.jqDropdown.hover(function (e) {
         thisWidget.jqDropdown.isHoveringNow = true;
-      }, function(e) {
+      }, function (e) {
         thisWidget.jqDropdown.isHoveringNow = false;
         thisWidget.jqDropdown.hide();
       });
@@ -179,11 +179,11 @@
         "apiMethod": "post",
         "parameters": {}
       });
-      var saveDataCallback = function(data) {
+      var saveDataCallback = function (data) {
         window.location = data.result.rows[0].result;;
       };
 
-      exportButton.bind('click', function(e) {
+      exportButton.bind('click', function (e) {
         if (triggerName.length > 0) {
           if (this.classList.contains("csvExport")) {
             TW.Runtime.exportingToCsv = true;
@@ -198,7 +198,7 @@
             } else if (this.classList.contains("wordExport")) {
               invoker.setParameterValue("target", "ExportInfotableAsWord")
             }
-            invoker.invokeService(saveDataCallback, function() {
+            invoker.invokeService(saveDataCallback, function () {
               alert("Failed to get export url. Please try again.")
             });
           }
@@ -219,23 +219,23 @@
       var widgetSelector = '#' + this.jqElementId + ' .dataexport-element2';
       var widgetContainer = '#' + this.jqElementId;
 
-      $(widgetSelector).on('focusin', function() {
+      $(widgetSelector).on('focusin', function () {
         $(widgetContainer).addClass('focus');
       });
 
-      $(widgetSelector).on('blur', function(e) {
+      $(widgetSelector).on('blur', function (e) {
         $(widgetContainer).removeClass('focus');
       });
 
     };
 
-    this.updateProperty = function(updatePropertyInfo) {
+    this.updateProperty = function (updatePropertyInfo) {
       if (updatePropertyInfo.TargetProperty === "Data") {
         thisWidget.setProperty("Data", updatePropertyInfo.RawDataFromInvoke);
       }
     };
 
-    this.beforeDestroy = function() {
+    this.beforeDestroy = function () {
       try {
         thisWidget.jqElement.unbind();
       } catch (err) {
