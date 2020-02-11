@@ -5,6 +5,18 @@
   border:none;
 }
 
+.dataexport-element2::after {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: .255em;
+  content: "";
+  border-top: .3em solid;
+  border-right: .3em solid transparent;
+  border-bottom: 0;
+  border-left: .3em solid transparent;
+}
+
 .widget-infotableExporter.roundedCorners, .widget-infotableExporter.roundedCorners .dataexport-element2 {
   border-radius: 6px;
 }
@@ -66,17 +78,6 @@
   display: inline-block;
 }
 
-/* Dropdown Content (Hidden by Default) */
-.dropdown-content {
-  display: table;
-  position: fixed;
-  background-color: #f3f3f3;
-  min-width: 240px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  transform: translateX(-30%);
-  z-index: 9999999;
-}
-
 /* Links inside the dropdown */
 .dropdown-content a {
   color: #646363;
@@ -88,18 +89,37 @@
   cursor: pointer;
 }
 
-.dropdown-content ul {
-  display: table-row;; /* Arrange list items in horizontal line */
-  list-style-type: none; /* We don't want bullets on our items */
-  margin: 0;
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 0;
+  z-index: 1000;
+  padding: .5rem 0;
+  margin: .125rem 0 0;
+  font-size: 1rem;
+  color: #212529;
+  z-index: 99999;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: .25rem;
 }
 
-.dropdown-content li {
-  display: table-cell;
+.dropdown-content a {
+  color: #212529;
+  font-weight: 400;
+  padding: .25rem 1.5rem;
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #0099ab}
+.dropdown-content a:hover {
+  background-color: #f8f9fa;
+  color: #16181b;
+}
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .widget-infotableExporter:hover .dropbtn {

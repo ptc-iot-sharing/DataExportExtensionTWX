@@ -29,7 +29,7 @@
 
       var html =
         '<div class="dropdown widget-content widget-infotableExporter ">' +
-        '<button class="dataexport-element2" tabindex="' +
+        '<button aria-haspopup="true" class="dataexport-element2" tabindex="' +
         thisWidget.getProperty('TabSequence') + '">' +
         '<span class="widget-infotableExporter-icon">' +
         ((formatResult.image !== undefined && formatResult.image.length > 0) ?
@@ -51,17 +51,16 @@
       // get a reference to the div with the dropdown
 
       thisWidget.jqDropdown = $('<div class="dropdown-content"> \
-        <ul>\
-    <li><a class="exportButton csvExport">CSV</a></li>\
-    <li><a class="exportButton excelExport">Excel</a></li>\
-    <li><a class="exportButton pdfExport">PDF</a></li>\
-    <li><a class="exportButton wordExport">Word</a></li>\
-    </ul>\
+          <a class="exportButton csvExport">CSV</a>\
+          <a class="exportButton excelExport">Excel</a>\
+          <a class="exportButton pdfExport">PDF</a>\
+          <a class="exportButton wordExport">Word</a>\
       </div>');
       // add the dropdown to the body
       $(document.body).prepend(thisWidget.jqDropdown);
       thisWidget.jqDropdown.hide();
-      thisWidget.jqElement.hover(function (e) {
+      thisWidget.jqElement.click(function (e) {
+        e.stopPropagation();
         var offset = thisWidget.jqElement.offset();
         var height = thisWidget.jqElement.height();
         var width = thisWidget.jqElement.width();
@@ -70,22 +69,15 @@
         thisWidget.jqDropdown.css({
           'position': 'absolute',
           'left': left,
-          'top': top
+          'top': top,
+          'width': width + 15
         });
         thisWidget.jqDropdown.show();
-      }, function (e) {
-        setTimeout(function () {
-          if (!thisWidget.jqDropdown.isHoveringNow) {
-            thisWidget.jqDropdown.hide();
-          }
-        }, 500);
       });
-
-      thisWidget.jqDropdown.hover(function (e) {
-        thisWidget.jqDropdown.isHoveringNow = true;
-      }, function (e) {
-        thisWidget.jqDropdown.isHoveringNow = false;
-        thisWidget.jqDropdown.hide();
+      $(document).click(function (e) {
+        if (thisWidget.jqDropdown.is(":visible")) {
+          thisWidget.jqDropdown.hide();
+        }
       });
 
       var formatResult = TW.getStyleFromStyleDefinition(thisWidget.getProperty('Style', 'DefaultButtonStyle'));
