@@ -14,6 +14,9 @@ import com.thingworx.types.primitives.IPrimitiveType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
@@ -50,6 +53,8 @@ class ExporterUtils {
         document.open();
         //create the pdf file with the right numbers of columns
         PdfPTable table = new PdfPTable(columnSize);
+        table.setTotalWidth(pageSize.getWidth() - 10);
+        table.setLockedWidth(true);
         table.setSplitLate(false);
         Font headerFont = new Font(Font.TIMES_ROMAN, 11, Font.BOLD, new Color(0, 0, 0));
         Font rowFont = new Font(Font.TIMES_ROMAN, 11);
@@ -69,7 +74,8 @@ class ExporterUtils {
                 IPrimitiveType cellValue = infotable.getRow(rowIndex).getOrDefault(field.getName(),
                         field.getDefaultValue());
                 if (cellValue != null) {
-                    table.addCell(new Phrase(cellValue.getStringValue(), rowFont));
+                    PdfPCell cell = getPdfCell(cellValue, FormatType.getFormatType(field.getBaseType()), rowFont);
+                    table.addCell(cell);
                 } else {
                     table.addCell("");
 
@@ -82,6 +88,32 @@ class ExporterUtils {
         DataExporterRepository.CreateBinaryFile(fileName, bos.toByteArray(), true);
 
         return DataExporterRepository.GetFileListingWithLinks("/", fileName).getRow(0).getStringValue("downloadLink");
+    }
+
+    private PdfPCell getPdfCell(IPrimitiveType value, FormatType formatType, Font font) {
+        PdfPCell cell = new PdfPCell();
+        if (value != null) {
+            switch (formatType) {
+                case HEADER:
+                    cell.setPhrase(new Phrase(value.getStringValue(), font));
+                    cell.setBackgroundColor(Color.LIGHT_GRAY);
+                    break;
+                case TEXT:
+                    cell.setPhrase(new Phrase(value.getStringValue(), font));
+                    break;
+                case INTEGER:
+                    cell.setPhrase(new Phrase(String.format("%d", (Integer) value.getValue()), font));
+                    break;
+                case FLOAT:
+                    cell.setPhrase(new Phrase(String.format("%.00f", (Double) value.getValue()), font));
+                    break;
+                case DATE:
+                    DateTimeFormatter dtf = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+                    cell.setPhrase(new Phrase(dtf.print((DateTime) value.getValue()), font));
+                    break;
+            }
+        }
+        return cell;
     }
 
     String ExportInfotableAsExcel(InfoTable infotable) throws Exception {

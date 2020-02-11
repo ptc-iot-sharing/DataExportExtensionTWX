@@ -77,17 +77,7 @@ public class InfotableToExcelPoi {
         dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss.SSS");
     }
 
-    private FormatType getFormatType(BaseTypes baseType) {
-        if (baseType == BaseTypes.INTEGER || baseType == BaseTypes.LONG) {
-            return FormatType.INTEGER;
-        } else if (baseType == BaseTypes.NUMBER) {
-            return FormatType.FLOAT;
-        } else if (baseType == BaseTypes.DATETIME) {
-            return FormatType.DATE;
-        } else {
-            return FormatType.TEXT;
-        }
-    }
+
 
     public void generate(InfoTable infoTable, OutputStream outputStream) throws IOException {
         try {
@@ -119,7 +109,7 @@ public class InfotableToExcelPoi {
         for (FieldDefinition fieldDefinition : infoTable.getDataShape().getFields().getOrderedFieldsByOrdinal()) {
             writeCell(row, i, new StringPrimitive(fieldDefinition.getName()), FormatType.HEADER, boldFont);
             if (isAutoDecideFormatTypes) {
-                formatTypes[i] = getFormatType(fieldDefinition.getBaseType());
+                formatTypes[i] = FormatType.getFormatType(fieldDefinition.getBaseType());
             }
             i++;
         }
@@ -308,15 +298,5 @@ public class InfotableToExcelPoi {
         };
 
         sheetCF.addConditionalFormatting(regions, rule1);
-    }
-
-    private enum FormatType {
-        TEXT,
-        INTEGER,
-        FLOAT,
-        DATE,
-        MONEY,
-        PERCENTAGE,
-        HEADER
     }
 }
