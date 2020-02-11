@@ -5,6 +5,8 @@
 
     var thisWidget = this;
     var roundedCorners = true;
+    var waitingForExport = false;
+    var exportType = "";
 
     this.runtimeProperties = function () {
       return {
@@ -162,18 +164,7 @@
       }
       var idOfThisMashup = this.idOfThisMashup;
       var exportButton = thisWidget.jqDropdown.find(".exportButton");
-      var exporterResource = "InfotableExporterFunctions";
-      var invoker = new ThingworxInvoker({
-        "entityType": "Resources",
-        "entityName": "InfotableExporterFunctions",
-        "characteristic": "Services",
-        "target": "",
-        "apiMethod": "post",
-        "parameters": {}
-      });
-      var saveDataCallback = function (data) {
-        window.location = data.result.rows[0].result;;
-      };
+
 
       exportButton.bind('click', function (e) {
         if (triggerName.length > 0) {
@@ -182,17 +173,19 @@
             $(idOfThisMashup).triggerHandler(triggerName);
             TW.Runtime.exportingToCsv = false;
           } else {
-            invoker.setParameterValue("infotable", thisWidget.getProperty('Data'));
             if (this.classList.contains("excelExport")) {
-              invoker.setParameterValue("target", "ExportInfotableAsExcel")
+              exportType = "excelExport";
             } else if (this.classList.contains("pdfExport")) {
-              invoker.setParameterValue("target", "ExportInfotableAsPdf")
+              exportType = "pdfExport";
             } else if (this.classList.contains("wordExport")) {
-              invoker.setParameterValue("target", "ExportInfotableAsWord")
+              exportType = "wordExport";
             }
-            invoker.invokeService(saveDataCallback, function () {
-              alert("Failed to get export url. Please try again.")
-            });
+            if (thisWidget.getProperty('Data')) {
+              thisWidget.doExport(exportType);
+            } else {
+              waitingForExport = true;
+              $(idOfThisMashup).triggerHandler(triggerName);
+            }
           }
 
         }
@@ -221,9 +214,38 @@
 
     };
 
+    this.doExport = function (type) {
+      var invoker = new ThingworxInvoker({
+        "entityType": "Resources",
+        "entityName": "InfotableExporterFunctions",
+        "characteristic": "Services",
+        "target": "",
+        "apiMethod": "post",
+        "parameters": {}
+      });
+      var saveDataCallback = function (data) {
+        window.location = data.result.rows[0].result;;
+      };
+      invoker.setParameterValue("infotable", thisWidget.getProperty('Data'));
+      if (type == "excelExport") {
+        invoker.setParameterValue("target", "ExportInfotableAsExcel")
+      } else if (type == "pdfExport") {
+        invoker.setParameterValue("target", "ExportInfotableAsPdf")
+      } else if (type == "wordExport") {
+        invoker.setParameterValue("target", "ExportInfotableAsWord")
+      }
+      invoker.invokeService(saveDataCallback, function () {
+        alert("Failed to get export url. Please try again.")
+      });
+    }
+
     this.updateProperty = function (updatePropertyInfo) {
       if (updatePropertyInfo.TargetProperty === "Data") {
         thisWidget.setProperty("Data", updatePropertyInfo.RawDataFromInvoke);
+        if(waitingForExport) {
+          thisWidget.doExport(exportType);
+          waitingForExport = false;
+        }
       }
     };
 
