@@ -46,14 +46,6 @@ project.ext {
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "${artifactory_contextUrl}/${artifactory_resolve_repokey}"
-        credentials {
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-        }
-    }
-
     flatDir {
         dirs project.ext.thingworxSdkDir
     }
